@@ -10,6 +10,7 @@ import livekitRoutes from './routes/livekit.ts'
 import sessionRoutes from './routes/session.ts'
 import trackRoutes from './routes/track.ts'
 import type { type } from 'os';
+import setupSocket from './sockets/setupSocket.ts';
 
 // Load environment variables
 dotenv.config();
@@ -24,6 +25,8 @@ const io = new Server(server, {
     methods: ["GET", "POST"]
   }
 });
+
+setupSocket(io)
 
 
 // Middleware

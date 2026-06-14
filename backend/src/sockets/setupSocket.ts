@@ -1,75 +1,85 @@
+import { type Server, type Socket } from "socket.io";
 
-import  { type Server, type Socket } from "socket.io";
- 
-import { type StudioState } from "../types";
+import { type StudioState } from "../types.d.ts";
+import jwtVerify from "../functions/auth.ts";
 const activeStudios = new Map<string, StudioState>();
+//The way of code_error and code_success is purely done because callback do not work in postman .I am fully aware of the better aproach.
+export default function setupSocket(io: Server) {
 
-export default function setupSocket(io:Server){
+io.use((socket, next) => {
+  // Extract token from client handshake data
+  console.log("I got in use")
+  const token = socket.handshake.headers.authorization; 
 
-  io.on("connect",(socket:Socket)=>{
- socket.on("join_studio",(studioId:string,name:string,id:string)=>{
- if(socket.data.role === "host"){
+  const result=jwtVerify(token)
+
+  if(!result.success){
       
-
-        if(activeStudios.has(studioId)){
-
-         const studio= activeStudios.get(studioId)
-        
-          if(!studio || !studio.host )return;
-
-          studio.host.socketId=socket.id;
-
-        
-        }
-        else{
-          activeStudios.set(`${studioId}`,{
-           studioId,
-           host:{name,socketId:socket.id,identity:id,isRecordingReady:false,uploadProgress:0},
-          isRecording:false,
-          participants:null
-
-
-
-          })
-        }
-
-      }
-      else{
-        return;
-      }
-      
-    })
-
-    
-
-  socket.on("request_access",(name:string,studioId:string)=>{
-
-if(!studioId || !name)return ;
-
-  const isStudio=activeStudios.has(`${studioId}`)
-
-    if(!isStudio){
-      return
+    socket.data.role="guest";
+      console.log("You are a guest")
+      return next()
     }
-      const studio=activeStudios.get("studioId")
- 
 
-      
-      //it should  return a callback but not know because it gives error when tested with postman
-      if(!studio || !studio.host)return ;
+      console.log("You are a host")
 
-
-
-    io.to(studio.host.socketId).emit("approve_guest",{
-        name
-      })
-
-
-
-
+    socket.data.role="host";
+    socket.data.id=result.id;
+     return next()
+  
     
-  })
+
+});
 
 
-  })
+  io.on("connect", (socket: Socket) => {
+    console.log("✅ Connected:", socket.id);
+  console.log("Role:", socket.data.role);
+    socket.on("join_studio", (name: string, studioId: string) => {
+      const roomExists = io.sockets.adapter.rooms.has(`${studioId}`);
+
+      if (!(socket.data.role === "host")) {
+        if (!roomExists) {
+          return socket.emit("code_error", {
+            event: "join_studio",
+            error: "Host is not currently their",
+          });
+        }
+
+        // TODO: later add code for request to the host and then allow the guest to come in
+
+        socket.join(studioId);
+       return socket.emit("code_success", {
+          event: "join_studio",
+        });
+      }
+      socket.join(studioId);
+
+      socket.emit("code_success", {
+        event: "join_studio",
+      });
+    });
+
+    socket.on("start_recording", (studioId: string) => {
+      if (socket.data.role === "guest") return;
+
+      socket.to(studioId).emit("start_recording", {
+        record: true,
+      });
+      socket.emit("code_success", {
+        event: "start_recording",
+      });
+    });
+ socket.on("stop_recording", (studioId: string) => {
+      if (socket.data.role === "guest") return;
+
+      socket.to(studioId).emit("stop_recording", {
+        record: false,
+      });
+      socket.emit("code_success", {
+        event: "stop_recording",
+      });
+    });
+
+
+  });
 }
