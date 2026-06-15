@@ -1,6 +1,6 @@
 import { type Server, type Socket } from "socket.io";
 
-import { type StudioState } from "../types.d.ts";
+import   type{ StudioState } from "../types";
 import jwtVerify from "../functions/auth.ts";
 const activeStudios = new Map<string, StudioState>();
 //The way of code_error and code_success is purely done because callback do not work in postman .I am fully aware of the better aproach.
