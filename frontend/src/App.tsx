@@ -1,8 +1,8 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Auth from "@/pages/Auth";
-import Dashboard from "@/pages/Dashboard";
-import Lobby from "@/pages/Lobby";
-import Studio from "@/pages/Studio";
+import Dashboard from "@/pages/Dashboard.tsx";
+import Lobby from "@/pages/Lobby.tsx";
+import Studio from "@/pages/Studio.tsx";
 
 // A simple component to check if the user is logged in
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
