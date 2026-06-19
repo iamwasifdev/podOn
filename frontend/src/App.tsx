@@ -3,6 +3,8 @@ import Auth from "@/pages/Auth";
 import Dashboard from "@/pages/Dashboard.tsx";
 import Lobby from "@/pages/Lobby.tsx";
 import Studio from "@/pages/Studio.tsx";
+import { SidebarProvider,SidebarTrigger } from "./components/ui/sidebar";
+
 
 // A simple component to check if the user is logged in
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
@@ -20,6 +22,10 @@ function App() {
           <Route path="/auth" element={<Auth />} />
 
           {/* 2. Protected Dashboard (Host Only) */}
+        <SidebarProvider>  
+
+            <SidebarTrigger/>
+
           <Route 
             path="/dashboard" 
             element={
@@ -28,6 +34,7 @@ function App() {
               </ProtectedRoute>
             } 
           />
+          </SidebarProvider>
 
           {/* 3. The Lobby (Where guests arrive via Invite Link) */}
           <Route path="/join/:inviteCode" element={<Lobby />} />

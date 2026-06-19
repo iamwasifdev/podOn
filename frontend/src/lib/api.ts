@@ -1,24 +1,24 @@
 import axios from "axios";
 
-// 1. Create the instance
 const api = axios.create({
-  // Use the URL from your .env file, or fallback to localhost
   baseURL: import.meta.env.VITE_BACKEND_URL || "http://localhost:5000",
 });
 
-// 2. The "Authorization" Interceptor
-// This runs before every single request your app makes
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem("token");
-  
-  if (token) {
-    // If we have a token, add it to the Headers
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-  
+  if (token) config.headers.Authorization = `Bearer ${token}`;
   return config;
-}, (error) => {
-  return Promise.reject(error);
 });
 
 export default api;
+
+export type LoginData = { email: string; password: string };
+export type SignupData = { username: string; email: string; password: string };
+export type AuthResponse = { token: string; user: { id: string; username: string; email: string } };
+
+export const authApi = {
+  login: (data: LoginData) =>
+    api.post<AuthResponse>("/api/auth/login", data).then((r) => r.data),
+  signup: (data: SignupData) =>
+    api.post<AuthResponse>("/api/auth/signup", data).then((r) => r.data),
+};

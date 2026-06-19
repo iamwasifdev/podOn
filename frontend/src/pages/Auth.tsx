@@ -1,6 +1,4 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import api from "@/lib/api";
 import {
   Mic,
   Zap,
@@ -13,6 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { useLogin, useSignup } from "@/hooks/useAuth";
 
 const BrandLogo = () => (
   <div className="flex items-center gap-3 group cursor-pointer">
@@ -42,36 +41,27 @@ const FeatureItem = ({ icon: Icon, title, desc }: any) => (
 );
 
 export default function Auth() {
-  const navigate = useNavigate();
   const [isLogin, setIsLogin] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const [formData, setFormData] = useState({
-    username: "",
-    email: "",
-    password: "",
-  });
+  const [form, setForm] = useState({ username: "", email: "", password: "" });
+
+  const login = useLogin();
+  const signup = useSignup();
+  const mutation = isLogin ? login : signup;
+  const isLoading = mutation.isPending;
 
   const handleChange = (e: any) =>
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    setForm({ ...form, [e.target.name]: e.target.value });
 
-  const handleAuth = async () => {
-    setIsLoading(true);
-    try {
-      const endpoint = isLogin ? "/api/auth/login" : "/api/auth/signup";
-      const response = await api.post(endpoint, formData);
-      localStorage.setItem("token", response.data.token);
-      localStorage.setItem("user", JSON.stringify(response.data.user));
-      navigate("/dashboard");
-    } catch (error: any) {
-      alert(error.response?.data?.message || "Auth Failed");
-    } finally {
-      setIsLoading(false);
-    }
+  const handleAuth = () => {
+    const data = isLogin
+      ? { email: form.email, password: form.password }
+      : form;
+
+    mutation.mutate(data as any);
   };
 
   return (
     <div className="relative min-h-screen bg-black flex items-center justify-center p-6 selection:bg-violet-500/30 overflow-hidden">
-      {/* Animated gradient orbs - heavy glow */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-[-20%] left-[-15%] w-[60%] h-[60%] bg-violet-600/25 blur-[180px] rounded-full animate-pulse" />
         <div className="absolute top-[30%] right-[-20%] w-[50%] h-[50%] bg-fuchsia-600/20 blur-[180px] rounded-full animate-pulse" />
@@ -80,7 +70,6 @@ export default function Auth() {
         <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-[0.06] brightness-0 invert" />
       </div>
 
-      {/* Grid overlay */}
       <div
         className="absolute inset-0 pointer-events-none opacity-[0.03]"
         style={{
@@ -90,17 +79,14 @@ export default function Auth() {
         }}
       />
 
-      {/* Rotating glow blob top-left */}
       <div className="absolute top-0 left-0 w-[400px] h-[400px] -translate-x-1/4 -translate-y-1/4 pointer-events-none">
-        <div className="absolute inset-0 bg-[conic-gradient(from_0deg,transparent,violet,fuchsia,purple,transparent)] blur-[80px] rounded-full animate-spin" style={{ animationDuration: '8s' }} />
+        <div className="absolute inset-0 bg-[conic-gradient(from_0deg,transparent,violet,fuchsia,purple,transparent)] blur-[80px] rounded-full animate-spin" style={{ animationDuration: "8s" }} />
         <div className="absolute inset-[15%] bg-black rounded-full blur-[40px]" />
       </div>
 
-      {/* Outer glow ring behind card */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[70%] h-[70%] bg-violet-500/5 blur-[200px] rounded-full pointer-events-none" />
 
       <div className="relative z-10 w-full max-w-[1000px] bg-zinc-900/80 border border-white/[0.06] rounded-[32px] overflow-hidden shadow-[0_0_60px_rgba(139,92,246,0.12),0_0_120px_rgba(139,92,246,0.06)] grid grid-cols-1 lg:grid-cols-5">
-        {/* LEFT PANEL */}
         <div className="hidden lg:flex col-span-2 flex-col justify-between p-12 border-r border-white/[0.05] bg-gradient-to-b from-violet-600/[0.06] via-fuchsia-600/[0.03] to-transparent relative overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-br from-violet-500/[0.04] to-transparent pointer-events-none" />
           <div className="absolute top-[-50%] right-[-50%] w-full h-full bg-violet-500/5 blur-[100px] rounded-full pointer-events-none" />
@@ -119,21 +105,9 @@ export default function Auth() {
               </h1>
 
               <div className="space-y-2.5">
-                <FeatureItem
-                  icon={Zap}
-                  title="Zero Latency"
-                  desc="Local recording ensures internet drops never ruin a session."
-                />
-                <FeatureItem
-                  icon={Shield}
-                  title="Resilient Uploads"
-                  desc="Progressive chunking saves your data every 10 seconds."
-                />
-                <FeatureItem
-                  icon={Sparkles}
-                  title="Studio Polish"
-                  desc="Automated level-matching and AI noise removal."
-                />
+                <FeatureItem icon={Zap} title="Zero Latency" desc="Local recording ensures internet drops never ruin a session." />
+                <FeatureItem icon={Shield} title="Resilient Uploads" desc="Progressive chunking saves your data every 10 seconds." />
+                <FeatureItem icon={Sparkles} title="Studio Polish" desc="Automated level-matching and AI noise removal." />
               </div>
             </div>
           </div>
@@ -145,10 +119,8 @@ export default function Auth() {
           </div>
         </div>
 
-        {/* RIGHT PANEL */}
         <div className="col-span-3 p-8 lg:p-16 flex flex-col justify-center bg-black/40">
           <div className="max-w-[360px] mx-auto w-full space-y-8">
-            {/* Header */}
             <div className="space-y-2 text-center lg:text-left">
               <h2 className="text-3xl font-bold tracking-tight">
                 <span className="bg-gradient-to-r from-white via-zinc-100 to-zinc-300 bg-clip-text text-transparent drop-shadow-[0_0_12px_rgba(255,255,255,0.04)]">
@@ -164,7 +136,6 @@ export default function Auth() {
 
             <div className="h-px bg-gradient-to-r from-transparent via-violet-400/20 to-transparent" />
 
-            {/* Form */}
             <div className="space-y-5">
               {!isLogin && (
                 <div className="space-y-2">
@@ -175,6 +146,7 @@ export default function Auth() {
                     id="username"
                     name="username"
                     placeholder="alex_creator"
+                    value={form.username}
                     onChange={handleChange}
                     size="xl"
                   />
@@ -189,6 +161,7 @@ export default function Auth() {
                   name="email"
                   type="email"
                   placeholder="name@company.com"
+                  value={form.email}
                   onChange={handleChange}
                   size="xl"
                 />
@@ -202,13 +175,13 @@ export default function Auth() {
                   name="password"
                   type="password"
                   placeholder="••••••••"
+                  value={form.password}
                   onChange={handleChange}
                   size="xl"
                 />
               </div>
             </div>
 
-            {/* Actions */}
             <div className="space-y-4 pt-2">
               <div className="relative">
                 <div className="absolute -inset-4 bg-gradient-to-r from-violet-600/15 via-fuchsia-600/15 to-purple-600/15 blur-2xl rounded-3xl opacity-75" />
@@ -231,7 +204,7 @@ export default function Auth() {
               </div>
 
               <button
-                onClick={() => setIsLogin(!isLogin)}
+                onClick={() => { setIsLogin(!isLogin); mutation.reset(); }}
                 className="w-full text-center text-xs text-zinc-500 hover:text-violet-300 transition-colors duration-300 group cursor-pointer bg-transparent border-0"
               >
                 <span className="relative">
@@ -243,7 +216,6 @@ export default function Auth() {
               </button>
             </div>
 
-            {/* Legal */}
             <div className="pt-6">
               <div className="h-px bg-gradient-to-r from-transparent via-violet-400/20 to-transparent mb-6" />
               <p className="text-[10px] text-zinc-600 text-center uppercase tracking-[0.2em] leading-loose">
