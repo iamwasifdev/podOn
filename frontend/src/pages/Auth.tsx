@@ -80,7 +80,10 @@ export default function Auth() {
       />
 
       <div className="absolute top-0 left-0 w-[400px] h-[400px] -translate-x-1/4 -translate-y-1/4 pointer-events-none">
-        <div className="absolute inset-0 bg-[conic-gradient(from_0deg,transparent,violet,fuchsia,purple,transparent)] blur-[80px] rounded-full animate-spin" style={{ animationDuration: "8s" }} />
+        <div
+          className="absolute inset-0 bg-[conic-gradient(from_0deg,transparent,violet,fuchsia,purple,transparent)] blur-[80px] rounded-full animate-spin"
+          style={{ animationDuration: "8s" }}
+        />
         <div className="absolute inset-[15%] bg-black rounded-full blur-[40px]" />
       </div>
 
@@ -105,15 +108,30 @@ export default function Auth() {
               </h1>
 
               <div className="space-y-2.5">
-                <FeatureItem icon={Zap} title="Zero Latency" desc="Local recording ensures internet drops never ruin a session." />
-                <FeatureItem icon={Shield} title="Resilient Uploads" desc="Progressive chunking saves your data every 10 seconds." />
-                <FeatureItem icon={Sparkles} title="Studio Polish" desc="Automated level-matching and AI noise removal." />
+                <FeatureItem
+                  icon={Zap}
+                  title="Zero Latency"
+                  desc="Local recording ensures internet drops never ruin a session."
+                />
+                <FeatureItem
+                  icon={Shield}
+                  title="Resilient Uploads"
+                  desc="Progressive chunking saves your data every 10 seconds."
+                />
+                <FeatureItem
+                  icon={Sparkles}
+                  title="Studio Polish"
+                  desc="Automated level-matching and AI noise removal."
+                />
               </div>
             </div>
           </div>
 
           <div className="relative z-10">
-            <Badge variant="gradient" className="text-[10px] tracking-widest uppercase px-3 py-1 rounded-full shadow-[0_0_20px_rgba(139,92,246,0.15)]">
+            <Badge
+              variant="gradient"
+              className="text-[10px] tracking-widest uppercase px-3 py-1 rounded-full shadow-[0_0_20px_rgba(139,92,246,0.15)]"
+            >
               Trusted by the top 1%
             </Badge>
           </div>
@@ -139,7 +157,10 @@ export default function Auth() {
             <div className="space-y-5">
               {!isLogin && (
                 <div className="space-y-2">
-                  <Label htmlFor="username" className="text-zinc-400 text-xs font-medium">
+                  <Label
+                    htmlFor="username"
+                    className="text-zinc-400 text-xs font-medium"
+                  >
                     Username
                   </Label>
                   <Input
@@ -153,7 +174,10 @@ export default function Auth() {
                 </div>
               )}
               <div className="space-y-2">
-                <Label htmlFor="email" className="text-zinc-400 text-xs font-medium">
+                <Label
+                  htmlFor="email"
+                  className="text-zinc-400 text-xs font-medium"
+                >
                   Email Address
                 </Label>
                 <Input
@@ -167,7 +191,10 @@ export default function Auth() {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="password" className="text-zinc-400 text-xs font-medium">
+                <Label
+                  htmlFor="password"
+                  className="text-zinc-400 text-xs font-medium"
+                >
                   Password
                 </Label>
                 <Input
@@ -204,7 +231,10 @@ export default function Auth() {
               </div>
 
               <button
-                onClick={() => { setIsLogin(!isLogin); mutation.reset(); }}
+                onClick={() => {
+                  setIsLogin(!isLogin);
+                  mutation.reset();
+                }}
                 className="w-full text-center text-xs text-zinc-500 hover:text-violet-300 transition-colors duration-300 group cursor-pointer bg-transparent border-0"
               >
                 <span className="relative">
